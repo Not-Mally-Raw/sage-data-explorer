@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,27 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Financial theme colors
+				finance: {
+					primary: '#0f172a',    // Deep navy
+					secondary: '#64748b',  // Slate gray
+					accent: '#0d9488',     // Teal
+					background: '#f8fafc', // Light gray
+					text: '#334155',       // Dark gray
+					success: '#10b981',    // Green
+					warning: '#f59e0b',    // Amber
+					danger: '#ef4444',     // Red
+				},
+				chart: {
+					blue: '#3b82f6',
+					green: '#10b981',
+					red: '#ef4444',
+					purple: '#8b5cf6',
+					amber: '#f59e0b',
+					pink: '#ec4899',
+					indigo: '#6366f1',
+					teal: '#14b8a6',
 				}
 			},
 			borderRadius: {
@@ -84,11 +106,33 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
+				'fade-out': {
+					'0%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					},
+					'100%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.3s ease-out',
+				'fade-out': 'fade-out 0.3s ease-out'
 			}
 		}
 	},
