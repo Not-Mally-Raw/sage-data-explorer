@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useFileProcessing } from "@/hooks/useFileProcessing";
 import { Button } from "@/components/ui/button";
-import { FileUp, AlertCircle, Loader2, CheckCircle, FileText, FileSpreadsheet } from "lucide-react";
+import { FileUp, AlertCircle, Loader2, CheckCircle, FileText, FileSpreadsheet, BarChart } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import geminiService from "@/services/geminiService";
