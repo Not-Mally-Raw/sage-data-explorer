@@ -1,17 +1,18 @@
 
 import React from "react";
 import AppLayout from "@/components/layout/AppLayout";
-import FileUploader from "@/components/upload/FileUploader";
+import EnhancedFileUploader from "@/components/upload/EnhancedFileUploader";
+import ChatBot from "@/components/chat/ChatBot";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Info } from "lucide-react";
 
 const Upload = () => {
-  const handleFileSelect = (file: File) => {
-    console.log("Selected file:", file);
-    // In a real app, you would process the file here
-    // For example, upload it to a server or parse it
+  const handleFileProcessed = (data: any) => {
+    console.log("File processed:", data);
+    // In a real app, you would store this in state or context
+    // And possibly update a backend API/Supabase
   };
 
   return (
@@ -36,12 +37,13 @@ const Upload = () => {
               <AlertTitle>Support for multiple file formats</AlertTitle>
               <AlertDescription>
                 You can upload CSV files for transaction data or PDF files for statements and invoices.
+                We now support OCR for scanned documents using Gemini API!
               </AlertDescription>
             </Alert>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
-                <FileUploader onFileSelect={handleFileSelect} />
+                <EnhancedFileUploader onFileProcessed={handleFileProcessed} />
               </div>
               
               <div className="lg:col-span-1">
@@ -64,7 +66,14 @@ const Upload = () => {
                       <h3 className="text-sm font-medium mb-1">PDF Processing</h3>
                       <p className="text-xs text-muted-foreground">
                         Text is extracted from PDFs and analyzed to identify financial data.
-                        Works with bank statements, invoices, and receipts.
+                        We now use AI-powered OCR for scanned documents.
+                      </p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium mb-1">Automatic Insights</h3>
+                      <p className="text-xs text-muted-foreground">
+                        Our system automatically generates visualizations and financial summaries
+                        based on your data. Ask our AI assistant for specific insights!
                       </p>
                     </div>
                     <div>
@@ -100,6 +109,9 @@ const Upload = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      {/* Add ChatBot component */}
+      <ChatBot />
     </AppLayout>
   );
 };

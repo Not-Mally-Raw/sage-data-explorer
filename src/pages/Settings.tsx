@@ -2,6 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
+import ChatBot from "@/components/chat/ChatBot";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -9,9 +10,41 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Key } from "lucide-react";
+import ApiKeySetup from "@/components/chat/ApiKeySetup";
+import geminiService from "@/services/geminiService";
+import { useToast } from "@/components/ui/use-toast";
 
 const Settings = () => {
+  const [showApiKeyModal, setShowApiKeyModal] = React.useState(false);
+  const [hasApiKey, setHasApiKey] = React.useState(false);
+  const { toast } = useToast();
+
+  // Check if API key is set on component mount
+  React.useEffect(() => {
+    setHasApiKey(geminiService.hasApiKey());
+  }, []);
+
+  const handleApiKeySet = () => {
+    setHasApiKey(true);
+    toast({
+      title: "API Key Set Successfully",
+      description: "You can now use the AI-powered features of FinancialSage.",
+    });
+  };
+
+  const handleClearApiKey = () => {
+    // Clear API key
+    sessionStorage.removeItem("gemini_api_key");
+    geminiService.setApiKey("");
+    setHasApiKey(false);
+    
+    toast({
+      title: "API Key Removed",
+      description: "The Gemini API key has been removed from your session.",
+    });
+  };
+
   return (
     <AppLayout activePath="/settings">
       <div className="animate-fade-in">
@@ -23,10 +56,11 @@ const Settings = () => {
         </div>
 
         <Tabs defaultValue="account" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="account">Account</TabsTrigger>
             <TabsTrigger value="preferences">Preferences</TabsTrigger>
             <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="apikeys">API Keys</TabsTrigger>
           </TabsList>
 
           <TabsContent value="account">
@@ -166,6 +200,59 @@ const Settings = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          <TabsContent value="apikeys">
+            <Card>
+              <CardHeader>
+                <CardTitle>API Keys</CardTitle>
+                <CardDescription>Manage API keys for external services</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-lg font-medium flex items-center">
+                        <Key className="h-4 w-4 mr-2" />
+                        Gemini API
+                      </h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Required for AI-powered natural language queries and OCR processing
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {hasApiKey ? (
+                        <>
+                          <div className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                            Configured
+                          </div>
+                          <Button variant="outline" size="sm" onClick={handleClearApiKey}>
+                            Clear Key
+                          </Button>
+                          <Button size="sm" onClick={() => setShowApiKeyModal(true)}>
+                            Update Key
+                          </Button>
+                        </>
+                      ) : (
+                        <Button onClick={() => setShowApiKeyModal(true)}>
+                          Set API Key
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-slate-50 rounded-md border border-slate-200">
+                    <h4 className="font-medium mb-2">Features enabled by Gemini API:</h4>
+                    <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                      <li>Natural language queries about your financial data</li>
+                      <li>OCR processing for scanned financial documents</li>
+                      <li>Automated insights generation</li>
+                      <li>Financial document classification</li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
 
         <div className="mt-6">
@@ -177,6 +264,16 @@ const Settings = () => {
           </Button>
         </div>
       </div>
+
+      {/* Add ChatBot */}
+      <ChatBot />
+      
+      {/* API Key Setup Modal */}
+      <ApiKeySetup 
+        isOpen={showApiKeyModal}
+        setIsOpen={setShowApiKeyModal}
+        onApiKeySet={handleApiKeySet}
+      />
     </AppLayout>
   );
 };

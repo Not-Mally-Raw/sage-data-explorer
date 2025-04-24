@@ -1,6 +1,7 @@
 
 import React from "react";
 import AppLayout from "@/components/layout/AppLayout";
+import ChatBot from "@/components/chat/ChatBot";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SampleChart from "@/components/dashboard/SampleChart";
@@ -131,6 +132,9 @@ const Analytics = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Add ChatBot */}
+      <ChatBot />
     </AppLayout>
   );
 };
