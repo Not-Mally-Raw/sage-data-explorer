@@ -4,7 +4,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, MessageCircle } from "lucide-react";
+import { Send, Loader2, MessageCircle, ChartBarIcon } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import geminiService from "@/services/geminiService";
@@ -30,6 +30,19 @@ const Chat = () => {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
+  // Add initial welcome message
+  useEffect(() => {
+    if (messages.length === 0) {
+      const welcomeMessage: MessageType = {
+        id: "welcome",
+        content: "Hello! I'm your financial assistant. I can help analyze your data, explain visualizations, or answer questions about your finances. What would you like to know?",
+        role: "assistant",
+        timestamp: new Date(),
+      };
+      setMessages([welcomeMessage]);
+    }
+  }, []);
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     // Prevent form submission
@@ -68,10 +81,12 @@ const Chat = () => {
 
     try {
       // Process the query with conversation history
-      const conversationHistory = messages.map(msg => ({
-        content: msg.content,
-        role: msg.role
-      }));
+      const conversationHistory = messages
+        .filter(msg => msg.id !== "welcome") // Skip welcome message for history
+        .map(msg => ({
+          content: msg.content,
+          role: msg.role
+        }));
       
       const response = await geminiService.processQuery(
         userMessage.content,
@@ -113,6 +128,18 @@ const Chat = () => {
     }
   };
 
+  // Example questions the user can ask
+  const exampleQuestions = [
+    "Explain the pie chart",
+    "Show me total expenses",
+    "Analyze spending trends",
+    "What is this document about?"
+  ];
+
+  const handleExampleClick = (question: string) => {
+    setMessage(question);
+  };
+
   return (
     <AppLayout activePath="/chat">
       <div className="flex flex-col h-[calc(100vh-2rem)]">
@@ -147,8 +174,8 @@ const Chat = () => {
                         : "bg-gray-100 rounded-tl-none"
                     }`}
                   >
-                    <p className="text-sm">{msg.content}</p>
-                    {msg.confidence !== undefined && (
+                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    {msg.confidence !== undefined && msg.confidence > 0 && (
                       <p className="text-xs mt-1 opacity-70">
                         Confidence: {msg.confidence.toFixed(2)}
                       </p>
@@ -168,11 +195,26 @@ const Chat = () => {
             <div ref={messagesEndRef} />
           </div>
 
+          {/* Example Questions */}
+          <div className="p-2 border-t border-gray-100">
+            <div className="flex flex-wrap gap-2 justify-center">
+              {exampleQuestions.map((question) => (
+                <button
+                  key={question}
+                  onClick={() => handleExampleClick(question)}
+                  className="px-2 py-1 bg-gray-100 text-xs rounded-full hover:bg-gray-200 transition-colors"
+                >
+                  {question}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Input Area */}
           <div className="p-4 border-t">
             <form onSubmit={handleSendMessage} className="flex gap-2">
               <Input
-                placeholder="Ask a question about your data..."
+                placeholder="Ask about your financial data..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 className="flex-1"
