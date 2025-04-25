@@ -9,6 +9,7 @@ import Upload from "./pages/Upload";
 import Data from "./pages/Data";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
+import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/data" element={<Data />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/chat" element={<Chat />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

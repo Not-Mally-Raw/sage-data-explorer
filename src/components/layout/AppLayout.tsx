@@ -1,4 +1,3 @@
-
 import React, { ReactNode, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import {
   X,
   Database,
   LineChart,
+  MessageCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -117,6 +117,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({
               label="Analytics"
               path="/analytics"
               isActive={activePath === "/analytics"}
+            />
+            <NavItem
+              icon={MessageCircle}
+              label="Chat"
+              path="/chat"
+              isActive={activePath === "/chat"}
             />
             <NavItem
               icon={Settings}

@@ -1,10 +1,8 @@
-
 import React from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import MetricCard from "@/components/dashboard/MetricCard";
 import ChartCard from "@/components/dashboard/ChartCard";
 import SampleChart from "@/components/dashboard/SampleChart";
-import ChatBot from "@/components/chat/ChatBot";
 import AutomatedInsights from "@/components/insights/AutomatedInsights";
 import { Button } from "@/components/ui/button";
 import { 
@@ -110,9 +108,6 @@ const Index = () => {
           </Link>
         </div>
       </div>
-
-      {/* Add the ChatBot component */}
-      <ChatBot />
     </AppLayout>
   );
 };
