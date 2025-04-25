@@ -1,6 +1,5 @@
-
 import React, { useState, useRef, useEffect } from "react";
-import { Send, Minimize2, Maximize2, AlertCircle, Loader2, Key } from "lucide-react";
+import { Send, Minimize2, Maximize2, AlertCircle, Loader2, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -37,12 +36,6 @@ const ChatBot = () => {
     
     if (!message.trim()) return;
 
-    // Check if API key is set
-    if (!geminiService.hasApiKey()) {
-      setShowApiKeyModal(true);
-      return;
-    }
-
     const userMessage: MessageType = {
       id: Date.now().toString(),
       content: message,
@@ -55,10 +48,9 @@ const ChatBot = () => {
     setIsLoading(true);
 
     try {
-      // Call Gemini API
       const response = await geminiService.processQuery(
         userMessage.content,
-        { messages: messages } // Pass context data if needed
+        { messages: messages }
       );
       
       const botResponse: MessageType = {
@@ -86,38 +78,14 @@ const ChatBot = () => {
     if (isMinimized) {
       setIsOpen(true);
       setIsMinimized(false);
-      
-      // Check if API key is needed when opening
-      if (!geminiService.hasApiKey() && messages.length === 0) {
-        setShowApiKeyModal(true);
-      }
     } else {
       setIsMinimized(true);
-      setTimeout(() => setIsOpen(false), 300); // Wait for animation
+      setTimeout(() => setIsOpen(false), 300);
     }
   };
 
-  const clearChat = () => {
-    setMessages([]);
-    toast({
-      title: "Chat history cleared",
-      description: "All chat messages have been removed.",
-    });
-  };
-
-  const handleApiKeySet = () => {
-    toast({
-      title: "API Key Set Successfully",
-      description: "You can now use the AI-powered chat features.",
-    });
-  };
-
-  const openApiKeyModal = () => {
-    setShowApiKeyModal(true);
-  };
-
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div className="fixed bottom-4 left-4 z-50">
       {/* Chat Button */}
       {!isOpen && (
         <Button 
@@ -125,19 +93,7 @@ const ChatBot = () => {
           className="bg-finance-accent hover:bg-finance-accent/90 shadow-lg rounded-full h-14 w-14 p-0 flex items-center justify-center"
           aria-label="Open chat assistant"
         >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            width="24" 
-            height="24" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            strokeLinejoin="round"
-          >
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
+          <MessageCircle className="h-6 w-6" />
         </Button>
       )}
 
@@ -178,16 +134,35 @@ const ChatBot = () => {
                     variant="ghost" 
                     size="sm"
                     className="h-8 w-8 p-0 text-white hover:bg-white/20"
-                    onClick={openApiKeyModal}
+                    onClick={() => setShowApiKeyModal(true)}
                     aria-label="API key settings"
                   >
-                    <Key className="h-4 w-4" />
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      width="20" 
+                      height="20" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    >
+                      <path d="M13 7h-2a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path>
+                      <path d="M16 7v3a5 5 0 0 0-10 0v-3"></path>
+                    </svg>
                   </Button>
                   <Button 
                     variant="ghost" 
                     size="sm"
                     className="h-8 w-8 p-0 text-white hover:bg-white/20"
-                    onClick={clearChat}
+                    onClick={() => {
+                      setMessages([]);
+                      toast({
+                        title: "Chat history cleared",
+                        description: "All chat messages have been removed.",
+                      });
+                    }}
                     aria-label="Clear chat history"
                   >
                     <AlertCircle className="h-4 w-4" />
@@ -205,27 +180,14 @@ const ChatBot = () => {
               </Button>
             </div>
           </CardHeader>
-          
+
           {!isMinimized && (
             <>
               {/* Messages Area */}
               <CardContent className="flex-1 overflow-y-auto p-3 space-y-4">
                 {messages.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center text-gray-500 p-4">
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      width="40" 
-                      height="40" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round"
-                      className="mb-4 text-gray-400"
-                    >
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
+                    <MessageCircle className="h-12 w-12 mb-4 text-gray-400" />
                     <p className="text-sm mb-2">Ask me about your financial data</p>
                     <p className="text-xs">Try "What is the total amount?" or "Show me top expenses"</p>
                   </div>
@@ -293,7 +255,12 @@ const ChatBot = () => {
       <ApiKeySetup 
         isOpen={showApiKeyModal}
         setIsOpen={setShowApiKeyModal}
-        onApiKeySet={handleApiKeySet}
+        onApiKeySet={() => {
+          toast({
+            title: "API Key Set Successfully",
+            description: "You can now use the AI-powered chat features.",
+          });
+        }}
       />
     </div>
   );

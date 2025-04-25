@@ -1,6 +1,4 @@
 
-import { toast } from "sonner";
-
 // Define types
 export interface GeminiResponse {
   text: string;
@@ -13,15 +11,14 @@ export interface GeminiError {
 }
 
 class GeminiService {
-  private apiKey: string | null = null;
+  // You can set your API key here directly
+  private apiKey: string = "YOUR_GEMINI_API_KEY";
   
   /**
    * Set the Gemini API key
    */
   setApiKey(key: string) {
     this.apiKey = key;
-    // In production, we would store this securely (not in localStorage)
-    // For demo purposes, we'll use session storage
     sessionStorage.setItem("gemini_api_key", key);
   }
   
@@ -30,7 +27,10 @@ class GeminiService {
    */
   getApiKey(): string | null {
     if (!this.apiKey) {
-      this.apiKey = sessionStorage.getItem("gemini_api_key");
+      const storedKey = sessionStorage.getItem("gemini_api_key");
+      if (storedKey) {
+        this.apiKey = storedKey;
+      }
     }
     return this.apiKey;
   }
