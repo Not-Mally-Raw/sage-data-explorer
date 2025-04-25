@@ -55,6 +55,7 @@ const Chat = () => {
       const botResponse: MessageType = {
         id: (Date.now() + 1).toString(),
         content: response.text,
+        role: "assistant", // Adding the missing 'role' property
         confidence: response.confidence,
         timestamp: new Date(),
       };
