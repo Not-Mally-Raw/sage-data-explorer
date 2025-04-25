@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send, Loader2, MessageCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import geminiService from "@/services/geminiService";
 
@@ -22,47 +22,87 @@ const Chat = () => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  // Scroll to bottom whenever messages change
+  useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
   const handleSendMessage = async (e?: React.FormEvent) => {
+    // Prevent form submission
     if (e) e.preventDefault();
     
+    // Don't process empty messages
     if (!message.trim()) return;
 
+    // Create user message
     const userMessage: MessageType = {
       id: Date.now().toString(),
-      content: message,
+      content: message.trim(),
       role: "user",
       timestamp: new Date(),
     };
     
+    // Add user message to chat
     setMessages((prev) => [...prev, userMessage]);
+    
+    // Clear input
     setMessage("");
+    
+    // Set loading state
     setIsLoading(true);
 
+    // Check if API key is set
+    if (!geminiService.hasApiKey()) {
+      toast({
+        title: "API Key Required",
+        description: "Please set your Gemini API key in the Settings page to use the chat feature.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
     try {
+      // Process the query with conversation history
+      const conversationHistory = messages.map(msg => ({
+        content: msg.content,
+        role: msg.role
+      }));
+      
       const response = await geminiService.processQuery(
         userMessage.content,
-        { messages: messages }
+        { messages: conversationHistory }
       );
       
+      // Create bot response
       const botResponse: MessageType = {
         id: (Date.now() + 1).toString(),
-        content: response.text,
-        role: "assistant", // Adding the missing 'role' property
-        confidence: response.confidence,
+        content: response.text || "I'm sorry, I couldn't process your request.",
+        role: "assistant", 
+        confidence: response.confidence ?? 0.75,
         timestamp: new Date(),
       };
       
+      // Add bot response to chat
       setMessages((prev) => [...prev, botResponse]);
     } catch (error: any) {
       console.error("Error processing query:", error);
+      
+      // Add error message to chat
+      const errorResponse: MessageType = {
+        id: (Date.now() + 1).toString(),
+        content: "I'm sorry, I encountered an error processing your request. Please try again.",
+        role: "assistant",
+        timestamp: new Date(),
+      };
+      
+      setMessages((prev) => [...prev, errorResponse]);
+      
+      // Show error toast
       toast({
         title: "Error processing query",
         description: error.message || "Something went wrong. Please try again.",
